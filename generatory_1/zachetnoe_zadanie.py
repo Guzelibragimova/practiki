@@ -119,7 +119,6 @@ def random_discount():
 
 def random_book(pk: int = 1):
     while True:
-        count = 0
         model = conf_py()
         pk = pk
         title = random_title()
@@ -147,7 +146,17 @@ def random_book(pk: int = 1):
         }
         yield one_book
         pk += 1
-        count += 1
+
+
+def countee():
+    count = 10
+    pk = 0
+    for i in random_book():
+        pk += 1
+        print(i)
+        print(f'Функция {random_book} была вызвана {pk} раз(а)')
+        if pk == count:
+            break
 
 
 def create_output_format(args):
@@ -185,4 +194,5 @@ def get_csv_file():
 
 if __name__ == '__main__':
     random_book()
-print(next(random_book()))
+    print(next(random_book()))
+    countee()
