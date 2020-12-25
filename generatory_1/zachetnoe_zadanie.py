@@ -4,20 +4,10 @@ from faker import Faker
 import argparse
 import json
 import csv
+import conf
 
 TITLES = 'titles'
 AUTHORS = 'authors.txt'
-
-
-def conf_py():
-    """
-    Считывает строку из файла conf.py
-    :return: возвращает сроку
-    """
-    with open('conf.py', 'rt', encoding='utf8') as a:
-        model = a.readline()
-        print(model)
-    return model
 
 
 def random_title():
@@ -38,11 +28,11 @@ def random_authors():
     Генерирует случайного автора
     :return: возращает случайного автора из файла authors.txt предварительно проверив регулярными выражениями
     """
-    patt_reg = re.compile(r'\b[А-Я]\w+\b\s\b[А-Я]\w+\b', re.DOTALL)
+    patt_reg = re.compile(r'\b[А-Я]\w+\b\s\b[А-Я]\w+\b')
     with open("authors.txt", 'rt', encoding='utf8') as file:
         a = []
         data = patt_reg.findall(file.read())
-        for i in range(5):
+        for _ in range(5):
             a.append(random.choice(data).strip())
         if data is None:
             print(ValueError)
@@ -54,8 +44,7 @@ def random_authors():
 
 def random_year():
     """
-
-    :return: возвращает случаный год в указанном промежутке
+    :return: возвращает случайный год в указанном промежутке
     """
     res = random.randint(1999, 2020)
     print(res)
@@ -65,7 +54,7 @@ def random_year():
 def random_pages():
     """
     Генерирует страницы
-    :return: возвращает случаную страницу в указанном промежутке
+    :return: возвращает случайную страницу в указанном промежутке
     """
     res = random.randint(1, 200)
     print(res)
@@ -75,11 +64,11 @@ def random_pages():
 def random_isbn13():
     """
     Генерирует isbn13 код
-    :return: возвращает случаный isbn13 код
+    :return: возвращает случайный isbn13 код
     """
     fake = Faker()
     Faker.seed(0)
-    for i in range(5):
+    for _ in range(5):
         fake.isbn13()
     res = fake.isbn13()
     return res
@@ -90,7 +79,7 @@ def random_rating():
     Генерирует рейтинг
     :return: возвращает рейтинг в пределах от 0 до 5
     """
-    res = int(random.uniform(0, 5))
+    res = random.uniform(0, 5)
     print(res)
     return res
 
@@ -98,7 +87,6 @@ def random_rating():
 def random_price():
     """
     Генерирует цену в пределах
-
     :return: возвращает цену в пределах от 120 до 5000 рублей
     """
     res = int(random.uniform(1200, 5000))
@@ -109,7 +97,6 @@ def random_price():
 def random_discount():
     """
     Генерирует размер скидки, генерируется случайным образом
-
     :return: возращает размер скидки
     """
     res = int(random.randint(1, 100))
@@ -118,22 +105,21 @@ def random_discount():
 
 
 def random_book(pk: int = 1):
+    count = 5
+    model = conf.MODEL
+    year = random_year()
+    pages = random_pages()
+    isbn13 = random_isbn13()
+    rating = random_rating()
+    price = random_price()
+    discount = random_discount()
+    author = random_authors()
     while True:
-        model = conf_py()
-        pk = pk
-        title = random_title()
-        year = random_year()
-        pages = random_pages()
-        isbn13 = random_isbn13()
-        rating = random_rating()
-        price = random_price()
-        discount = random_discount()
-        author = random_authors()
         one_book = {
             "model": model,
             "pk": pk,
             "fields": {
-                "title": title,
+                "title": random_title(),
                 "year": year,
                 "pages": pages,
                 "isbn13": isbn13,
@@ -144,19 +130,11 @@ def random_book(pk: int = 1):
 
             }
         }
+        pk += 1
         yield one_book
-        pk += 1
-
-
-def countee():
-    count = 10
-    pk = 0
-    for i in random_book():
-        pk += 1
-        print(i)
-        print(f'Функция {random_book} была вызвана {pk} раз(а)')
         if pk == count:
             break
+        print(f'Функция {random_book} была вызвана {pk} раз(а)')
 
 
 def create_output_format(args):
@@ -183,8 +161,10 @@ def create_subparsers():
 
 
 def get_json_file():
-    with open('ty.json', "w") as fl:
-        json.dumps(fl, indent=4)
+    ...
+
+    # with open('ty.json', "w") as fl:
+    #     json.dump(fl, ,  indent=4)
 
 
 def get_csv_file():
@@ -193,6 +173,5 @@ def get_csv_file():
 
 
 if __name__ == '__main__':
-    random_book()
-    print(next(random_book()))
-    countee()
+    for i in random_book():
+        print(next(random_book()))

@@ -1,1 +1,1 @@
-"shop_final.book"
+MODEL = "shop_final.book"
