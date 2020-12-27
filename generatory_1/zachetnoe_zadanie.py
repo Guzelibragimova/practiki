@@ -1,10 +1,12 @@
 import random
 import re
-from faker import Faker
+import csv
 import argparse
 import json
-import csv
+
+from faker import Faker
 import conf
+
 
 TITLES = 'titles'
 AUTHORS = 'authors.txt'
@@ -99,7 +101,7 @@ def random_discount():
     Генерирует размер скидки, генерируется случайным образом
     :return: возращает размер скидки
     """
-    res = int(random.randint(1, 100))
+    res = random.randint(1, 100)
     print(res)
     return res
 
@@ -107,41 +109,49 @@ def random_discount():
 def random_book(pk: int = 1):
     count = 5
     model = conf.MODEL
-    year = random_year()
-    pages = random_pages()
-    isbn13 = random_isbn13()
-    rating = random_rating()
-    price = random_price()
-    discount = random_discount()
-    author = random_authors()
     while True:
         one_book = {
             "model": model,
             "pk": pk,
             "fields": {
                 "title": random_title(),
-                "year": year,
-                "pages": pages,
-                "isbn13": isbn13,
-                "rating": rating,
-                "price": price,
-                "discount": discount,
-                "author": author
+                "year": random_year(),
+                "pages": random_pages(),
+                "isbn13": random_isbn13(),
+                "rating": random_rating(),
+                "price": random_price(),
+                "discount": random_discount(),
+                "author": random_authors()
 
             }
         }
-        pk += 1
         yield one_book
+        pk += 1
         if pk == count:
             break
         print(f'Функция {random_book} была вызвана {pk} раз(а)')
 
+        # json_str = json.dumps(one_book, indent=4)
+        # print(json_str)
+        # with open('authors_random', 'w', encoding='utf-8') as f:
+        #     f.write(json_str)
 
-def create_output_format(args):
-    args.output_format = 'output_format'
-    if args.output_format == 'json':
-        get_json_file()
-    if args.output_format == 'csv':
+
+def get_json_file(obj, filename, indent=1):
+    if not filename.endswith('.json'):
+        filename += '.json'
+    with open(filename, 'w') as f:
+        json.dump(obj, f, indent=indent)
+
+
+def do_output(args):
+    # self.json = args.json
+    # self.csv = args.csv
+    # self.output_format = args.output_format
+
+    if args.output_format == 'output_json':
+        get_json_file(one_book, 'tmp_json_indent_4')
+    if args.output_format == 'output_csv':
         get_csv_file()
 
 
@@ -156,15 +166,8 @@ def create_subparsers():
     csv_parser = subparsers.add_parser('csv')
     csv_parser.add_argument('-csv', '--index', dest='output format', required=True,
                             help='if we want parse to csv format')
-
-    return parser
-
-
-def get_json_file():
-    ...
-
-    # with open('ty.json', "w") as fl:
-    #     json.dump(fl, ,  indent=4)
+    args = parser.parse_args()
+    return args
 
 
 def get_csv_file():
@@ -173,5 +176,21 @@ def get_csv_file():
 
 
 if __name__ == '__main__':
+    one_book = {
+        "model": conf.MODEL,
+        "pk": 1,
+        "fields": {
+            "title": random_title(),
+            "year": random_year(),
+            "pages": random_pages(),
+            "isbn13": random_isbn13(),
+            "rating": random_rating(),
+            "price": random_price(),
+            "discount": random_discount(),
+            "author": random_authors(),
+        }}
+    random_book()
     for i in random_book():
         print(next(random_book()))
+    print(next(random_book()))
+    get_json_file(one_book, 'tmp_json_indent_4')
